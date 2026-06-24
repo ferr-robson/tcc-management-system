@@ -85,7 +85,7 @@ function handleFileChange(event) {
 
             <div class="form-group form-group-full">
                 <label for="tipo">
-                    tipo
+                    Tipo
                 </label>
                 <select id="tipo" v-model.number="form.tipo">
                     <option :value="''">

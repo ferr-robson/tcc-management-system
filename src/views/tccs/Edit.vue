@@ -1,113 +1,126 @@
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { reactive, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import Form from './Form.vue'
 
+const router = useRouter()
 const route = useRoute()
 
-const alunos = ref([])
-const professores = ref([])
+interface Aluno {
+    id: number
+    nome: string
+    matricula: string
+}
+
+interface Professor {
+    id: number
+    nome: string
+}
 
 const form = reactive({
-  titulo: '',
-  palavras_chave: '',
-  resumo: '',
-  semestre_letivo_defesa: '',
-  tipo: '',
-  idioma: '',
-  aluno: null,
-  status: '0',
-  orientador: null,
-  coorientador: null,
-  presidente: null,
-  primeiro_membro: null,
-  segundo_membro: null,
-  arquivo: null
+    titulo: '',
+    palavras_chave: '',
+    resumo: '',
+    tipo: '',
+    idioma: '',
+    aluno: null,
+    orientador: null,
+    semestre_letivo_defesa: '',
+    status: null,
+    presidente: null,
+    primeiro_membro: null,
+    segundo_membro: null,
+    coorientador: null,
+    arquivo: '',
 })
+
+const professores = ref<Professor[]>([]);
+const alunos = ref<Aluno[]>([]);
 
 onMounted(async () => {
+    try {
+        const id = route.params.id
 
-  const [
-    tccResponse,
-    alunosResponse,
-    professoresResponse
-  ] = await Promise.all([
+        const [tccResponse, professoresResponse, alunosResponse] =
+            await Promise.all([
+                fetch(`http://127.0.0.1:8000/api/tccs/${id}/`),
+                fetch('http://127.0.0.1:8000/api/professores/'),
+                fetch('http://127.0.0.1:8000/api/alunos/')
+            ])
 
-    fetch(
-      `http://127.0.0.1:8000/api/tccs/${route.params.id}/`
-    ),
+        if (!tccResponse.ok || !professoresResponse.ok || !alunosResponse.ok) {
+            throw new Error('Erro ao buscar dados')
+        }
 
-    fetch(
-      'http://127.0.0.1:8000/api/alunos/'
-    ),
+        const tcc = await tccResponse.json()
 
-    fetch(
-      'http://127.0.0.1:8000/api/professores/'
-    )
+        professores.value = await professoresResponse.json()
+        alunos.value = await alunosResponse.json()
 
-  ])
+        Object.assign(form, tcc)
 
-  Object.assign(
-    form,
-    await tccResponse.json()
-  )
-
-  alunos.value =
-  await alunosResponse.json()
-
-  professores.value =
-  await professoresResponse.json()
-
+    } catch (error) {
+        console.error(error)
+    }
 })
 
-async function save(){
+async function save() {
+    try {
+        const id = route.params.id
 
-  const formData =
-  new FormData()
+        const formData = new FormData()
 
-  Object.entries(form).forEach(
-    ([key,value]) => {
+        Object.entries(form).forEach(([key, value]) => {
+            if (value === null || value === undefined) return
 
-      if(
-        value !== null &&
-        value !== undefined
-      ){
-        formData.append(
-          key,
-          value as any
+            formData.append(
+                key,
+                value instanceof File ? value : String(value)
+            )
+        })
+
+        const response = await fetch(
+            `http://127.0.0.1:8000/api/tccs/${id}/`,
+            {
+                method: 'PUT', // ou PATCH (melhor)
+                body: formData
+            }
         )
-      }
 
+        if (!response.ok) {
+            throw new Error('Erro ao atualizar TCC')
+        }
+
+        router.push('/tccs')
+
+    } catch (error) {
+        console.error(error)
     }
-  )
-
-  await fetch(
-
-    `http://127.0.0.1:8000/api/tccs/${route.params.id}/`,
-
-    {
-      method:'PUT',
-      body:formData
-    }
-
-  )
-
-  alert('TCC atualizado com sucesso')
-
 }
 </script>
 
 <template>
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+        <router-link to="/tccs">
+            TCCs
+        </router-link>
 
-<h1 class="title">
-Editar TCC
-</h1>
+        <span class="separator">›</span>
 
-<Form
-  :form="form"
-  :alunos="alunos"
-  :professores="professores"
-  @submit="save"
-/>
+        <span class="current">
+            Aditar TCC
+        </span>
+    </nav>
 
+    <h1 class="title">Editar TCC</h1>
+
+    <Form :form="form" :alunos="alunos" :professores="professores" @submit="save">
+        <button class="system-button" @click="router.push('/tccs')">
+            Voltar
+        </button>
+
+        <button class="system-button" type="submit">
+            Salvar
+        </button>
+    </Form>
 </template>
