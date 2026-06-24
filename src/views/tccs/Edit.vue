@@ -31,7 +31,7 @@ const form = reactive({
     primeiro_membro: null,
     segundo_membro: null,
     coorientador: null,
-    arquivo: '',
+    arquivo: null,
 })
 
 const professores = ref<Professor[]>([]);

@@ -2,6 +2,9 @@
 import { ref, computed, onMounted } from 'vue'
 import Table from '@/components/Table.vue'
 import Modal from '@/components/Modal.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 interface Aluno {
     id: number
@@ -14,28 +17,26 @@ interface Professor {
 }
 
 interface TCC {
-  id: number
+    id: number
 
-  titulo: string
-  palavras_chave: string
-  resumo: string
+    titulo: string
+    palavras_chave: string
+    resumo: string
 
-  semestre_letivo_defesa: string
+    semestre_letivo_defesa: string
 
-  aluno: number
+    aluno: number
 
-  orientador: number
-  coorientador: number
+    orientador: number
+    coorientador: number
 
-  presidente: number
-  primeiro_membro: number
-  segundo_membro: number
+    presidente: number
+    primeiro_membro: number
+    segundo_membro: number
 
-  idioma_display: string
-  status_display: string
-  tipo_display: string
-
-  arquivo?: string | null
+    idioma_display: string
+    status_display: string
+    tipo_display: string
 }
 
 const columns = [
@@ -54,14 +55,6 @@ const columns = [
     {
         key: 'acoes',
         label: 'Ações'
-    },
-    {
-    key:'editar',
-    label:'Editar'
-    },
-    {
-    key:'enviar',
-    label:'Enviar'
     }
 ]
 
@@ -129,30 +122,6 @@ const professoresMap = computed(() =>
         ])
     )
 )
-async function enviarTcc(id:number){
-
-  await fetch(
-
-    `http://127.0.0.1:8000/api/tccs/${id}/`,
-
-    {
-      method:'PATCH',
-
-      headers:{
-        'Content-Type':
-        'application/json'
-      },
-
-      body:JSON.stringify({
-        status:'1'
-      })
-    }
-
-  )
-
-  window.location.reload()
-
-}
 </script>
 
 <template>
@@ -167,13 +136,6 @@ async function enviarTcc(id:number){
                 <button class="system-button" @click="openDetails(row)">
                     Ver detalhes
                 </button>
-            </template>
-            <template #cell-editar="{ row }">
-                <router-link :to="`/tcc/edit/${row.id}`">
-                <button class="system-button">
-                    Editar
-                </button>
-                </router-link>
             </template>
         </Table>
 
@@ -238,41 +200,18 @@ async function enviarTcc(id:number){
                     {{ professoresMap[selectedTcc.segundo_membro] }}
                 </p>
 
-                <p
-                v-if="selectedTcc.arquivo"
-                >
-
-                <a
-                :href="selectedTcc.arquivo"
-                target="_blank"
-                >
-
-                <button class="system-button">
-                Download Arquivo
-                </button>
-
-                </a>
-
-                </p>
-
                 <h3>Resumo</h3>
                 <p>
                     {{ selectedTcc.resumo }}
                 </p>
-                <a v-if="selectedTcc.arquivo"
-                    style="float: left; text-decoration: none;" 
-                    class="system-button" 
-                    :href="selectedTcc.arquivo" 
-                    download
-                    target="_blank">
+                <a v-if="selectedTcc.arquivo" style="float: left; text-decoration: none;" class="system-button"
+                    :href="selectedTcc.arquivo" download target="_blank">
                     Baixar arquivo
                 </a>
+                <button style="margin-left: 1rem; float: right;" class="system-button" @click="router.push(`/tcc/edit/${selectedTcc.id}`)">
+                    Editar
+                </button>
             </template>
         </Modal>
     </section>
 </template>
-
-
-
-
-
