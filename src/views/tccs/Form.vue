@@ -7,20 +7,20 @@ interface TCCForm {
     semestre_letivo_defesa: string
 
     tipo: string
+
     idioma: string
 
     aluno: number | null
 
-    status: string  | null
+    status: number | null
 
     orientador: number | null
-    coorientador: number | null
-
     presidente: number | null
     primeiro_membro: number | null
     segundo_membro: number | null
-    
-    arquivo?: File | string | null
+    coorientador: number | null
+
+    arquivo: File
 }
 
 interface Aluno {
@@ -59,6 +59,9 @@ const semestres = Array.from(
 //         form.arquivo = target.files[0]
 //     }
 // }
+function handleFileChange(event) {
+    props.form.arquivo = event.target.files[0];
+}
 </script>
 
 <template>
@@ -69,14 +72,17 @@ const semestres = Array.from(
                 <label for="titulo">Título</label>
                 <input id="titulo" v-model="form.titulo" type="text" />
             </div>
+
             <div class="form-group form-group-full">
                 <label for="palavras_chave">Palavras-chave</label>
                 <input id="palavras_chave" v-model="form.palavras_chave" type="text" />
             </div>
+
             <div class="form-group form-group-full">
                 <label for="resumo">Resumo</label>
                 <textarea id="resumo" v-model="form.resumo" />
             </div>
+
             <div class="form-group form-group-full">
                 <label for="tipo">
                     tipo
@@ -99,6 +105,7 @@ const semestres = Array.from(
                     </option>
                 </select>
             </div>
+
             <div class="form-group form-group-full">
                 <label for="idioma">
                     Idioma
@@ -115,6 +122,7 @@ const semestres = Array.from(
                     </option>
                 </select>
             </div>
+
             <div class="form-group form-group-full">
                 <label for="aluno">
                     Aluno
@@ -128,6 +136,7 @@ const semestres = Array.from(
                     </option>
                 </select>
             </div>
+
             <div class="form-group form-group-full">
                 <label for="status">
                     Status
@@ -150,11 +159,12 @@ const semestres = Array.from(
                     </option>
                 </select>
             </div>
+
             <div class="form-group form-group-full">
                 <label for="semestre">
                     Semestre
                 </label>
-                <select v-model="form.semestre_letivo_defesa">
+                <select id="semestre" v-model="form.semestre_letivo_defesa">
                     <option value="">
                         Selecione um semestre
                     </option>
@@ -163,6 +173,7 @@ const semestres = Array.from(
                     </option>
                 </select>
             </div>
+
             <div class="form-group form-group-full">
                 <label for="orientador">
                     Orientador
@@ -176,6 +187,7 @@ const semestres = Array.from(
                     </option>
                 </select>
             </div>
+
             <div class="form-group form-group-full">
                 <label for="coorientador">
                     Coorientador
@@ -189,6 +201,7 @@ const semestres = Array.from(
                     </option>
                 </select>
             </div>
+
             <div class="form-group form-group-full">
                 <label for="presidente">
                     Presidente
@@ -202,6 +215,7 @@ const semestres = Array.from(
                     </option>
                 </select>
             </div>
+
             <div class="form-group form-group-full">
                 <label for="primeiro_membro">
                     Primeiro membro
@@ -215,6 +229,7 @@ const semestres = Array.from(
                     </option>
                 </select>
             </div>
+
             <div class="form-group form-group-full">
                 <label for="segundo_membro">
                     Segundo membro
@@ -227,6 +242,13 @@ const semestres = Array.from(
                         {{ professor.nome }}
                     </option>
                 </select>
+            </div>
+
+            <div class="form-group form-group-full">
+                <label for="arquivo">
+                    Enviar arquivo
+                </label>
+                <input type="file" name="arquivo" id="arquivo" @change="handleFileChange">
             </div>
         </div>
 

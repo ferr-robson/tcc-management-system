@@ -13,7 +13,7 @@ const emit = defineEmits<{
         <div class="modal" @click.stop>
             <slot />
 
-            <button class="system-button" @click="$emit('close')">
+            <button style="float: right;" class="system-button" @click="$emit('close')">
                 Fechar
             </button>
         </div>

@@ -259,6 +259,14 @@ async function enviarTcc(id:number){
                 <p>
                     {{ selectedTcc.resumo }}
                 </p>
+                <a v-if="selectedTcc.arquivo"
+                    style="float: left; text-decoration: none;" 
+                    class="system-button" 
+                    :href="selectedTcc.arquivo" 
+                    download
+                    target="_blank">
+                    Baixar arquivo
+                </a>
             </template>
         </Modal>
     </section>
